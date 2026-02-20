@@ -3,7 +3,7 @@
 @section('content')
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
+        <div class="col-md-8 col-lg-10" st>
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
                 <!-- Header dengan tema navy -->
                 <div class="card-header bg-navy text-white border-0 py-4 px-4" style="background: linear-gradient(135deg, #000080 0%, #1E3A8A 50%, #2563EB 100%);">
@@ -61,6 +61,18 @@
 
                     <form method="POST" action="{{ route('game.players.store', $game) }}" id="playerForm">
                         @csrf
+                        @php
+                            $tokenOptions = [
+                                'style_1' => 'Style 1',
+                                'style_2' => 'Style 2',
+                                'style_3' => 'Style 3',
+                                'style_4' => 'Style 4',
+                                'style_5' => 'Style 5',
+                                'style_6' => 'Style 6',
+                                'style_7' => 'Style 7',
+                                'style_8' => 'Style 8',
+                            ];
+                        @endphp
                         
                         <!-- Daftar Input Nama Pemain dengan desain kartu -->
                         <div class="players-container mb-4">
@@ -94,6 +106,40 @@
                                                     <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
                                                 </div>
                                             @enderror
+                                            <div class="mt-2">
+                                                <label class="form-label fw-semibold text-secondary mb-1">
+                                                    Pilih Bidak
+                                                </label>
+                                                @php
+                                                    $selectedToken = old('token_style.' . ($i-1), array_keys($tokenOptions)[$i - 1] ?? 'style_1');
+                                                @endphp
+                                                <div class="token-current-preview mb-2" id="token-preview-wrapper-{{ $i }}">
+                                                    <img id="token-preview-{{ $i }}"
+                                                         src="{{ asset('images/tokens/' . $selectedToken . '.png') }}"
+                                                         alt="Preview Bidak Pemain {{ $i }}"
+                                                         class="token-preview-image-lg">
+                                                    <span class="small text-muted ms-2" id="token-preview-label-{{ $i }}">{{ $tokenOptions[$selectedToken] ?? 'Style 1' }}</span>
+                                                </div>
+                                                <div class="token-options-grid @error('token_style.' . ($i-1)) is-invalid @enderror">
+                                                    @foreach($tokenOptions as $value => $label)
+                                                        <label class="token-option-item">
+                                                            <input type="radio"
+                                                                   name="token_style[{{ $i-1 }}]"
+                                                                   value="{{ $value }}"
+                                                                   data-player-index="{{ $i }}"
+                                                                   data-token-label="{{ $label }}"
+                                                                   {{ $selectedToken === $value ? 'checked' : '' }}
+                                                                   required>
+                                                            <img src="{{ asset('images/tokens/' . $value . '.png') }}" alt="{{ $label }}">
+                                                        </label>
+                                                    @endforeach
+                                                </div>
+                                                @error('token_style.' . ($i-1))
+                                                    <div class="invalid-feedback d-block">
+                                                        <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
+                                                    </div>
+                                                @enderror
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -332,6 +378,75 @@
         box-shadow: 0 0 0 0.001rem rgba(0, 0, 128, 0.45);
     }
 
+    .token-current-preview {
+        display: flex;
+        align-items: center;
+        padding: 8px 10px;
+        border: 1px solid #dbe4ff;
+        border-radius: 10px;
+        background: #f8fbff;
+    }
+
+    .token-preview-image-lg {
+        width: 34px;
+        height: 34px;
+        object-fit: contain;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        background: white;
+        padding: 2px;
+    }
+
+    .token-options-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .token-option-item {
+        border: 1px solid #dbe4ff;
+        border-radius: 10px;
+        padding: 6px 4px;
+        text-align: center;
+        cursor: pointer;
+        background: white;
+        transition: all 0.2s ease;
+        margin: 0;
+    }
+
+    .token-option-item:hover {
+        border-color: #000080;
+        transform: translateY(-1px);
+        box-shadow: 0 5px 12px rgba(0, 0, 128, 0.12);
+    }
+
+    .token-option-item input {
+        display: none;
+    }
+
+    .token-option-item img {
+        width: 38px;
+        height: 38px;
+        object-fit: contain;
+        border-radius: 6px;
+    }
+
+    .token-option-item span {
+        display: block;
+        font-size: 0.68rem;
+        color: #334155;
+        line-height: 1.1;
+    }
+
+    .token-option-item input:checked + img {
+        border-color: #000080;
+    }
+
+    .token-option-item:has(input:checked) {
+        border-color: #000080;
+        background: #eef2ff;
+    }
+
     /* Alert Navy */
     .alert-navy {
         border-left: 4px solid #000080;
@@ -402,7 +517,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Animasi untuk setiap input card
     const playerCards = document.querySelectorAll('.player-input-card');
     playerCards.forEach((card, index) => {
-        const input = card.querySelector('input');
+        const input = card.querySelector('input[type="text"]');
+        if (!input) return;
         input.addEventListener('focus', () => {
             card.style.transform = 'translateX(5px)';
             card.style.borderColor = '#000080';
@@ -422,6 +538,23 @@ document.addEventListener('DOMContentLoaded', function() {
             card.style.borderColor = '#000080';
             card.style.boxShadow = '0 5px 15px rgba(0, 0, 128, 0.1)';
         }
+    });
+
+    // Update preview gambar bidak per pemain
+    const tokenRadios = document.querySelectorAll('.token-option-item input[type="radio"]');
+    tokenRadios.forEach((radio) => {
+        radio.addEventListener('change', function() {
+            const playerIndex = this.dataset.playerIndex;
+            const preview = document.getElementById(`token-preview-${playerIndex}`);
+            const previewLabel = document.getElementById(`token-preview-label-${playerIndex}`);
+            const selectedImage = this.parentElement.querySelector('img');
+            if (preview && selectedImage) {
+                preview.src = selectedImage.src;
+            }
+            if (previewLabel) {
+                previewLabel.textContent = this.dataset.tokenLabel || this.value;
+            }
+        });
     });
 });
 </script>

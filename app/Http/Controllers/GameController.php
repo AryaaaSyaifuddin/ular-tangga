@@ -44,8 +44,20 @@ class GameController extends Controller
 
     public function storePlayers(Request $request, Game $game)
     {
+        $tokenStyles = [
+            'style_1',
+            'style_2',
+            'style_3',
+            'style_4',
+            'style_5',
+            'style_6',
+            'style_7',
+            'style_8',
+        ];
+
         $request->validate([
-            'nama.*' => 'required|string|max:255'
+            'nama.*' => 'required|string|max:255',
+            'token_style.*' => 'required|in:' . implode(',', $tokenStyles),
         ]);
 
         foreach ($request->nama as $index => $nama) {
@@ -53,7 +65,8 @@ class GameController extends Controller
                 'game_id' => $game->id,
                 'nama' => $nama,
                 'posisi' => 1,
-                'urutan' => $index + 1
+                'urutan' => $index + 1,
+                'token_style' => $request->token_style[$index] ?? 'style_1',
             ]);
         }
 
@@ -101,6 +114,7 @@ class GameController extends Controller
         $dice = rand(1, 6);
         $oldPos = $player->posisi;
         $newPos = $oldPos + $dice;
+        $snakeLadder = null;
 
         // Cek apakah melebihi 100
         if ($newPos > 100) {
