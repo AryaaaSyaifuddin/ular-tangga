@@ -379,7 +379,7 @@
         color: var(--gray-800);
     }
 
-    /* Modal */
+    /* Modal - Professional & Elegant (White Dominant) */
     .modal.fade .modal-dialog {
         transform: translate3d(0, 18px, 0) scale(0.985);
         opacity: 0;
@@ -393,108 +393,203 @@
     }
 
     .modal-content {
-        background: #1A0505;
-        border: 1px solid var(--crimson);
-        border-radius: 40px;
+        background: #FFFFFF;
+        border: 1px solid rgba(185,28,28,0.15);
+        border-radius: 32px;
         overflow: hidden;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.55);
+        box-shadow: 0 24px 48px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.08);
         will-change: transform, opacity;
     }
 
     .modal-header {
-        background: #2D0A0A;
-        border-bottom: 1px solid rgba(185,28,28,0.35);
-        padding: 24px 28px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(253,246,246,0.96) 100%);
+        border-bottom: 1px solid rgba(185,28,28,0.12);
+        padding: 28px 32px;
+        align-items: center;
     }
 
     .modal-title {
-        color: #FCA5A5;
+        color: var(--crimson-dark);
         font-weight: 700;
-        font-size: 1.8rem;
+        font-size: 1.75rem;
+        letter-spacing: 0.5px;
     }
 
     .modal-header .btn-close {
-        filter: brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(310deg);
-        opacity: 0.8;
+        filter: invert(0.2);
+        opacity: 0.6;
+        transition: all 0.2s ease;
+    }
+
+    .modal-header .btn-close:hover {
+        opacity: 1;
+        filter: invert(0);
     }
 
     .modal-body {
-        background: #1A0505;
-        padding: 32px;
-        color: white;
+        background: #FFFFFF;
+        padding: 40px 36px;
+        color: var(--gray-800);
     }
 
-    #questionModal .modal-dialog { max-width: 840px; width: min(92vw, 840px); }
-    #questionModal .modal-body { padding: 30px 36px; }
-    #questionModal #modal-question-text { font-size: 2.1rem; line-height: 1.45; }
+    #questionModal .modal-dialog { max-width: 760px; width: min(92vw, 760px); }
+    #questionModal .modal-body { padding: 48px 40px; }
+    #questionModal #modal-question-text { 
+        font-size: 1.95rem; 
+        line-height: 1.55; 
+        color: var(--gray-800);
+        background: linear-gradient(135deg, rgba(239,68,68,0.04) 0%, rgba(253,246,246,0.06) 100%);
+        padding: 32px 28px;
+        border-radius: 20px;
+        border-left: 5px solid var(--crimson);
+    }
 
-    #modal-question-text { font-size: 2rem; font-weight: 500; margin-bottom: 24px; }
+    #modal-question-text { 
+        font-size: 1.9rem; 
+        font-weight: 600; 
+        margin-bottom: 28px; 
+        color: var(--gray-800);
+        letter-spacing: 0.3px;
+        background: linear-gradient(135deg, rgba(239,68,68,0.04) 0%, rgba(253,246,246,0.06) 100%);
+        padding: 32px 28px;
+        border-radius: 20px;
+        border-left: 5px solid var(--crimson);
+    }
 
     #modal-timer {
-        font-size: 2rem;
+        font-size: 2.4rem;
         font-weight: 700;
-        color: var(--crimson-light);
-        text-shadow: 0 0 20px rgba(239,68,68,0.5);
+        color: var(--crimson);
+        text-shadow: none;
+        margin-top: 16px;
+        padding: 16px 24px;
+        background: linear-gradient(135deg, rgba(239,68,68,0.12) 0%, rgba(253,246,246,0.12) 100%);
+        border-radius: 16px;
+        display: inline-block;
+        border: 1px solid rgba(239,68,68,0.2);
     }
 
     /* Dice modal */
-    #dice-result {
-        font-size: 15rem;
-        line-height: 1;
-        filter: drop-shadow(0 0 10px rgba(239,68,68,0.4));
-        color: white;
+    #dice-animation {
+        width: 170px;
+        height: 170px;
+        margin: 24px auto;
+        perspective: 800px;
+        display: grid;
+        place-items: center;
+    }
+
+    .dice-cube {
+        width: 112px;
+        height: 112px;
+        position: relative;
+        transform-style: preserve-3d;
+        transform: rotateX(0deg) rotateY(0deg);
+        transition: transform 0.42s cubic-bezier(0.2, 0.9, 0.2, 1.15);
         will-change: transform;
     }
 
-    .dice-rolling { animation: dice-roll-3d 0.34s infinite linear; will-change: transform, filter; }
-    .dice-land    { animation: dice-land-bounce 0.3s ease-out; }
+    .dice-face {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        gap: 8px;
+        padding: 18px;
+        background: linear-gradient(145deg, #FFFFFF, #F8FAFC);
+        border: 2px solid rgba(185,28,28,0.22);
+        border-radius: 18px;
+        box-shadow: inset -10px -10px 18px rgba(185,28,28,0.08), inset 8px 8px 16px rgba(255,255,255,0.9);
+        backface-visibility: hidden;
+    }
 
-    @keyframes dice-roll-3d {
-        0%   { transform: rotate(0deg) scale(0.92); }
-        50%  { transform: rotate(180deg) scale(1.04); }
-        100% { transform: rotate(360deg) scale(0.92); }
+    .dice-face.front  { transform: translateZ(56px); }
+    .dice-face.back   { transform: rotateY(180deg) translateZ(56px); }
+    .dice-face.right  { transform: rotateY(90deg) translateZ(56px); }
+    .dice-face.left   { transform: rotateY(-90deg) translateZ(56px); }
+    .dice-face.top    { transform: rotateX(90deg) translateZ(56px); }
+    .dice-face.bottom { transform: rotateX(-90deg) translateZ(56px); }
+
+    .dice-dot {
+        width: 15px;
+        height: 15px;
+        align-self: center;
+        justify-self: center;
+        border-radius: 50%;
+        background: var(--crimson);
+        box-shadow: inset 2px 2px 3px rgba(255,255,255,0.32), inset -2px -2px 4px rgba(69,10,10,0.32);
+    }
+
+    .dot-center { grid-column: 2; grid-row: 2; }
+    .dot-top-left { grid-column: 1; grid-row: 1; }
+    .dot-top-right { grid-column: 3; grid-row: 1; }
+    .dot-middle-left { grid-column: 1; grid-row: 2; }
+    .dot-middle-right { grid-column: 3; grid-row: 2; }
+    .dot-bottom-left { grid-column: 1; grid-row: 3; }
+    .dot-bottom-right { grid-column: 3; grid-row: 3; }
+
+    .dice-cube.dice-rolling {
+        animation: dice-real-roll 0.72s linear infinite;
+        transition: none;
+    }
+
+    .dice-cube.dice-land {
+        animation: dice-land-bounce 0.34s ease-out;
+    }
+
+    @keyframes dice-real-roll {
+        0%   { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(0.96); }
+        35%  { transform: rotateX(190deg) rotateY(130deg) rotateZ(45deg) scale(1.02); }
+        70%  { transform: rotateX(360deg) rotateY(300deg) rotateZ(120deg) scale(0.98); }
+        100% { transform: rotateX(540deg) rotateY(420deg) rotateZ(180deg) scale(0.96); }
     }
 
     @keyframes dice-land-bounce {
-        0%   { transform: scale(1.22); opacity: 0.9; }
-        55%  { transform: scale(0.96); }
-        80%  { transform: scale(1.03); }
-        100% { transform: scale(1); }
+        0%   { filter: drop-shadow(0 18px 14px rgba(0,0,0,0.22)); }
+        45%  { transform: var(--dice-transform) translateY(-8px) scale(1.04); }
+        72%  { transform: var(--dice-transform) translateY(3px) scale(0.98); }
+        100% { transform: var(--dice-transform) translateY(0) scale(1); }
     }
 
-    .modal-footer { border-top: 1px solid rgba(185,28,28,0.22); }
+    .modal-footer { 
+        border-top: 1px solid rgba(185,28,28,0.12); 
+        background: rgba(255,255,255,0.5);
+        padding: 20px 32px;
+    }
 
     .btn-navy, .btn-navy-outline {
         padding: 12px 28px;
         border-radius: 60px;
         font-weight: 600;
+        transition: all 0.2s ease;
     }
 
     .btn-navy {
-        background: linear-gradient(135deg, var(--crimson-dark), var(--crimson));
+        background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
         border: none;
         color: white;
-        transition: all 0.2s;
     }
 
     .btn-navy:hover {
-        background: linear-gradient(135deg, var(--crimson), var(--crimson-light));
+        background: linear-gradient(135deg, var(--crimson-light), var(--crimson));
         color: white;
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(239,68,68,0.3);
     }
 
     .btn-navy-outline {
         background: transparent;
         border: 2px solid var(--crimson);
-        color: #FCA5A5;
-        transition: all 0.2s;
+        color: var(--crimson);
+        transition: all 0.2s ease;
     }
 
     .btn-navy-outline:hover {
-        background: rgba(185,28,28,0.25);
-        color: white;
-        border-color: var(--crimson-light);
+        background: rgba(185,28,28,0.08);
+        color: var(--crimson-dark);
+        border-color: var(--crimson-dark);
+        transform: translateY(-2px);
     }
 
     /* Animations */
@@ -607,12 +702,12 @@
                         'triangle_red'    => 'style_1', 'triangle_yellow' => 'style_2',
                         'circle_black'    => 'style_3', 'circle_blue'     => 'style_4',
                         'square_green'    => 'style_5', 'square_orange'   => 'style_6',
-                        'diamond_purple'  => 'style_7', 'hex_cyan'        => 'style_8',
+                        'diamond_purple'  => 'style_1', 'hex_cyan'        => 'style_2',
                     ];
                     $tokenByPlayer = [];
                     foreach ($game->players as $p) {
                         $raw = $p->token_style ?? 'style_1';
-                        $normalized = preg_match('/^style_[1-8]$/', $raw) ? $raw : ($legacyTokenMap[$raw] ?? 'style_1');
+                        $normalized = preg_match('/^style_[1-6]$/', $raw) ? $raw : ($legacyTokenMap[$raw] ?? 'style_1');
                         $tokenByPlayer[$p->id] = $normalized;
                     }
                     for ($i = 10; $i >= 1; $i--) {
@@ -732,7 +827,41 @@
             </div>
             <div class="modal-body text-center">
                 <div id="dice-animation" class="my-4">
-                    <span id="dice-result" class="display-1">⚀</span>
+                    <div id="dice-cube" class="dice-cube" aria-label="Dadu" role="img">
+                        <div class="dice-face front">
+                            <span class="dice-dot dot-center"></span>
+                        </div>
+                        <div class="dice-face right">
+                            <span class="dice-dot dot-top-left"></span>
+                            <span class="dice-dot dot-bottom-right"></span>
+                        </div>
+                        <div class="dice-face top">
+                            <span class="dice-dot dot-top-left"></span>
+                            <span class="dice-dot dot-center"></span>
+                            <span class="dice-dot dot-bottom-right"></span>
+                        </div>
+                        <div class="dice-face bottom">
+                            <span class="dice-dot dot-top-left"></span>
+                            <span class="dice-dot dot-top-right"></span>
+                            <span class="dice-dot dot-bottom-left"></span>
+                            <span class="dice-dot dot-bottom-right"></span>
+                        </div>
+                        <div class="dice-face left">
+                            <span class="dice-dot dot-top-left"></span>
+                            <span class="dice-dot dot-top-right"></span>
+                            <span class="dice-dot dot-center"></span>
+                            <span class="dice-dot dot-bottom-left"></span>
+                            <span class="dice-dot dot-bottom-right"></span>
+                        </div>
+                        <div class="dice-face back">
+                            <span class="dice-dot dot-top-left"></span>
+                            <span class="dice-dot dot-top-right"></span>
+                            <span class="dice-dot dot-middle-left"></span>
+                            <span class="dice-dot dot-middle-right"></span>
+                            <span class="dice-dot dot-bottom-left"></span>
+                            <span class="dice-dot dot-bottom-right"></span>
+                        </div>
+                    </div>
                 </div>
                 <p id="dice-message" class="fs-5"></p>
             </div>
@@ -821,16 +950,43 @@
     const modalQuestionText = document.getElementById('modal-question-text');
     const modalTimer       = document.getElementById('modal-timer');
     const diceModal        = new bootstrap.Modal(document.getElementById('diceModal'));
-    const diceResult       = document.getElementById('dice-result');
+    const diceCube         = document.getElementById('dice-cube');
     const diceMessage      = document.getElementById('dice-message');
     const diceOkBtn        = document.getElementById('dice-ok-btn');
     const rollDiceBtn      = document.getElementById('roll-dice-btn');
-    const diceFaces        = ['\u2680','\u2681','\u2682','\u2683','\u2684','\u2685'];
+    const diceFaceTransforms = {
+        1: 'rotateX(0deg) rotateY(0deg)',
+        2: 'rotateX(0deg) rotateY(-90deg)',
+        3: 'rotateX(-90deg) rotateY(0deg)',
+        4: 'rotateX(90deg) rotateY(0deg)',
+        5: 'rotateX(0deg) rotateY(90deg)',
+        6: 'rotateX(0deg) rotateY(180deg)'
+    };
     const tokenBasePath    = @json(asset('images/tokens'));
-    let randomDiceInterval = null;
     let selectedPlayerName = null;
 
     if (gameFinished) { showPodium(); }
+
+    function setDiceFace(value) {
+        const transform = diceFaceTransforms[value] || diceFaceTransforms[1];
+        diceCube.style.setProperty('--dice-transform', transform);
+        diceCube.style.transform = transform;
+        diceCube.setAttribute('aria-label', `Dadu angka ${value}`);
+    }
+
+    function startDiceRoll() {
+        diceCube.classList.remove('dice-land');
+        diceCube.style.transform = '';
+        diceCube.classList.add('dice-rolling');
+    }
+
+    function landDice(value) {
+        diceCube.classList.remove('dice-rolling');
+        setDiceFace(value);
+        void diceCube.offsetWidth;
+        diceCube.classList.add('dice-land');
+        setTimeout(() => diceCube.classList.remove('dice-land'), 420);
+    }
 
     function showPodium() {
         fetch(`/game/${gameId}/ranking`, {
@@ -960,8 +1116,8 @@
     function nextFrame() { return new Promise(r => requestAnimationFrame(r)); }
 
     function normalizeTokenStyle(t) {
-        const m={triangle_red:'style_1',triangle_yellow:'style_2',circle_black:'style_3',circle_blue:'style_4',square_green:'style_5',square_orange:'style_6',diamond_purple:'style_7',hex_cyan:'style_8'};
-        return /^style_[1-8]$/.test(t||'') ? t : (m[t]||'style_1');
+        const m={triangle_red:'style_1',triangle_yellow:'style_2',circle_black:'style_3',circle_blue:'style_4',square_green:'style_5',square_orange:'style_6',diamond_purple:'style_1',hex_cyan:'style_2'};
+        return /^style_[1-6]$/.test(t||'') ? t : (m[t]||'style_1');
     }
 
     function layoutTokensInCell(cell) {
@@ -1099,26 +1255,20 @@
         if (!selectedPlayerId) { alert('Pilih pemain terlebih dahulu.'); return; }
         rollDiceBtn.disabled=true; rollDiceBtn.innerText='Mengacak...';
         document.querySelectorAll('.select-player-btn').forEach(b=>b.style.display='none');
-        diceResult.innerText='⚀'; diceResult.classList.remove('dice-land'); diceResult.classList.add('dice-rolling');
+        startDiceRoll();
         diceMessage.innerText=`Mengocok dadu untuk ${selectedPlayerName}...`;
         diceOkBtn.disabled=true; window.lastDiceData=null; diceModal.show();
-        randomDiceInterval=setInterval(()=>{ diceResult.innerText=diceFaces[Math.floor(Math.random()*6)]; },110);
         setTimeout(()=>{
             fetch(`/game/${gameId}/roll-dice/${selectedPlayerId}`,{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','Content-Type':'application/json'}})
             .then(r=>r.json()).then(data=>{
-                clearInterval(randomDiceInterval); randomDiceInterval=null;
-                diceResult.classList.remove('dice-rolling');
-                diceResult.innerText=diceFaces[data.dice-1];
-                diceResult.classList.add('dice-land');
-                setTimeout(()=>diceResult.classList.remove('dice-land'),450);
+                landDice(data.dice);
                 let msg=`${data.playerName} mendapat dadu ${data.dice}. Pindah dari ${data.oldPos} ke ${data.newPos}.`;
                 if (data.effect==='snake') msg+=`\n${data.playerName} terkena ular, turun ke ${data.effectEnd}.`;
                 else if (data.effect==='ladder') msg+=`\n${data.playerName} mendapat tangga, naik ke ${data.effectEnd}.`;
                 diceMessage.innerText=msg;
                 window.lastDiceData=data; diceOkBtn.disabled=false;
             }).catch(()=>{
-                clearInterval(randomDiceInterval); randomDiceInterval=null;
-                diceResult.classList.remove('dice-rolling');
+                diceCube.classList.remove('dice-rolling');
                 diceMessage.innerText='Terjadi kesalahan. Silakan coba lagi.'; diceOkBtn.disabled=false;
             });
         },1450);

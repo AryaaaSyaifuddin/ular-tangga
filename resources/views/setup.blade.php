@@ -3,8 +3,8 @@
 @section('content')
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6" style="width: 80%;">
-            <div class="card overflow-hidden">
+        <div class="col-12 col-lg-8 col-xl-7">
+            <div class="card setup-card overflow-hidden">
                 <!-- Header -->
                 <div class="card-header crimson-header">
                     <div class="d-flex align-items-center">
@@ -20,7 +20,7 @@
                     </div>
                 </div>
 
-                <div class="card-body p-4 p-lg-5" style="background: var(--crimson-subtle);">
+                <div class="card-body setup-body p-4 p-lg-5">
                     <form method="POST" action="{{ route('game.setup') }}" id="setupForm">
                         @csrf
 
@@ -46,26 +46,39 @@
 
                         <!-- Materi Selection -->
                         <div class="mb-4">
-                            <label for="materi_id" class="form-label fw-semibold" style="color:var(--gray-700);">
-                                <i class="fas fa-book-open me-2 text-crimson"></i>Pilih Materi
-                            </label>
-                            <div class="position-relative">
-                                <select class="form-select form-select-lg @error('materi_id') is-invalid @enderror"
-                                        id="materi_id" name="materi_id" required
-                                        style="border-left: 4px solid var(--crimson); background-color: white;">
-                                    <option value="" disabled selected>-- Pilih Materi Pembelajaran --</option>
-                                    @foreach($materis as $materi)
-                                        <option value="{{ $materi->id }}" {{ old('materi_id') == $materi->id ? 'selected' : '' }}>
-                                            📚 {{ $materi->nama }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <label class="form-label fw-semibold mb-0" style="color:var(--gray-700);">
+                                    <i class="fas fa-book-open me-2 text-crimson"></i>Pilih Materi
+                                </label>
+                                <button type="button" class="btn btn-sm btn-outline-crimson" id="selectAllMateriBtnToggle"
+                                        style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
+                                    <i class="fas fa-check-square me-1"></i>Pilih Semua
+                                </button>
                             </div>
-                            @error('materi_id')
-                                <div class="invalid-feedback d-block">
-                                    <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
+                            <div class="materi-checkboxes-container p-3 border rounded-3" 
+                                 style="background: rgba(255,255,255,0.5); border-color: rgba(185,28,28,0.12) !important;">
+                                @foreach($materis as $materi)
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input materi-checkbox" type="checkbox"
+                                               id="materi_{{ $materi->id }}" name="materi_id[]"
+                                               value="{{ $materi->id }}"
+                                               {{ in_array($materi->id, (array) old('materi_id', [])) ? 'checked' : '' }}
+                                               style="width: 1.25rem; height: 1.25rem; cursor: pointer; accent-color: var(--crimson);">
+                                        <label class="form-check-label" for="materi_{{ $materi->id }}"
+                                               style="cursor: pointer; color: var(--gray-700); margin-bottom: 0;">
+                                                {{ $materi->nama }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                            @if($errors->has('materi_id'))
+                                <div class="invalid-feedback d-block mt-2">
+                                    <i class="fas fa-exclamation-circle me-1"></i>{{ $errors->first('materi_id') }}
                                 </div>
-                            @enderror
+                            @endif
+                            <div id="materiErrorMsg" class="invalid-feedback d-none mt-2">
+                                <i class="fas fa-exclamation-circle me-1"></i>Pilih minimal satu materi
+                            </div>
                         </div>
 
                         <!-- Jumlah Pemain -->
@@ -122,22 +135,7 @@
                             </span>
                         </button>
 
-                        <p class="text-center small mt-3 mb-0" style="color:var(--gray-500);">
-                            <i class="fas fa-shield-alt me-1"></i>Data aman &amp; tidak disimpan
-                        </p>
                     </form>
-                </div>
-            </div>
-
-            <!-- Decorative Dice -->
-            <div class="text-center mt-4">
-                <div class="dice-decoration">
-                    <i class="fas fa-dice-one fa-2x me-2"></i>
-                    <i class="fas fa-dice-two fa-2x me-2"></i>
-                    <i class="fas fa-dice-three fa-2x me-2"></i>
-                    <i class="fas fa-dice-four fa-2x me-2"></i>
-                    <i class="fas fa-dice-five fa-2x me-2"></i>
-                    <i class="fas fa-dice-six fa-2x"></i>
                 </div>
             </div>
         </div>
@@ -146,12 +144,84 @@
 
 <style>
     /* Setup-specific styles */
-    .player-counter-wrapper .input-group { box-shadow: var(--shadow-sm); }
-    .player-counter-wrapper .btn { width: 50px; background: white; transition: all 0.3s ease; }
+    .setup-card {
+        border: 1px solid rgba(185,28,28,0.12);
+        border-radius: 24px;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .setup-body {
+        background:
+            linear-gradient(180deg, rgba(255,255,255,0.92), rgba(253,246,246,0.96)),
+            var(--crimson-subtle);
+    }
+
+    #materi_id,
+    #jumlah_pemain {
+        border-color: rgba(185,28,28,0.18);
+        box-shadow: none;
+    }
+
+    /* Materi Checkboxes Styling */
+    .materi-checkboxes-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .materi-checkboxes-container .form-check {
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: white;
+        border: 1px solid rgba(185,28,28,0.08);
+        transition: all 0.2s ease;
+        margin-bottom: 0;
+    }
+
+    .materi-checkboxes-container .form-check:hover {
+        background: rgba(185,28,28,0.02);
+        border-color: rgba(185,28,28,0.15);
+        box-shadow: 0 2px 8px rgba(185,28,28,0.08);
+    }
+
+    .materi-checkboxes-container .form-check-input {
+        border-color: rgba(185,28,28,0.25);
+        border-radius: 4px;
+    }
+
+    .materi-checkboxes-container .form-check-input:checked {
+        background-color: var(--crimson);
+        border-color: var(--crimson);
+        box-shadow: none;
+    }
+
+    .materi-checkboxes-container .form-check-input:focus {
+        border-color: var(--crimson);
+        box-shadow: 0 0 0 0.2rem rgba(185,28,28,0.25);
+    }
+
+    .materi-checkboxes-container .form-check-label {
+        font-weight: 500;
+        color: var(--gray-700);
+    }
+
+    #materi_id {
+        min-height: 52px;
+        border-left: 4px solid var(--crimson);
+        border-radius: 12px;
+    }
+
+    .player-counter-wrapper .input-group {
+        box-shadow: var(--shadow-sm);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+    .player-counter-wrapper .btn { width: 54px; background: white; transition: all 0.2s ease; }
     .player-counter-wrapper .btn:focus { box-shadow: none; }
+    .player-counter-wrapper .btn:hover { background: var(--crimson-soft); }
 
     .player-preview .player-icon {
-        width: 40px; height: 40px; border-radius: 50%;
+        width: 42px; height: 42px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
         font-weight: 700; font-size: 1.1rem; animation: popIn 0.3s ease;
     }
@@ -174,6 +244,16 @@
     }
 
     .form-select-lg { background-image: none; appearance: none; }
+
+    .alert-crimson-info {
+        border-radius: 16px;
+        border: 1px solid rgba(185,28,28,0.12);
+        background: rgba(255,255,255,0.72);
+    }
+
+    @media (max-width: 576px) {
+        .setup-progress .step-label { font-size: 0.72rem; }
+    }
 </style>
 
 <script>
@@ -207,11 +287,66 @@ document.addEventListener('DOMContentLoaded', function() {
         if (v < 4) { jumlahInput.value = v + 1; updatePlayerPreview(jumlahInput.value); }
     });
 
-    form.addEventListener('submit', function() {
+    // Materi checkboxes - Select All functionality
+    const selectAllBtn = document.getElementById('selectAllMateriBtnToggle');
+    const materiCheckboxes = document.querySelectorAll('.materi-checkbox');
+    const materiErrorMsg = document.getElementById('materiErrorMsg');
+
+    function updateSelectAllBtn() {
+        const checkedCount = document.querySelectorAll('.materi-checkbox:checked').length;
+        const totalCount = materiCheckboxes.length;
+        
+        if (checkedCount === totalCount && totalCount > 0) {
+            selectAllBtn.innerHTML = '<i class="fas fa-times-square me-1"></i>Batalkan Semua';
+            selectAllBtn.classList.remove('btn-outline-crimson');
+            selectAllBtn.classList.add('btn-crimson', 'text-white');
+        } else {
+            selectAllBtn.innerHTML = '<i class="fas fa-check-square me-1"></i>Pilih Semua';
+            selectAllBtn.classList.remove('btn-crimson', 'text-white');
+            selectAllBtn.classList.add('btn-outline-crimson');
+        }
+    }
+
+    selectAllBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const checkedCount = document.querySelectorAll('.materi-checkbox:checked').length;
+        const totalCount = materiCheckboxes.length;
+        const shouldCheckAll = checkedCount < totalCount;
+
+        materiCheckboxes.forEach(checkbox => {
+            checkbox.checked = shouldCheckAll;
+        });
+        
+        updateSelectAllBtn();
+        materiErrorMsg.classList.add('d-none');
+    });
+
+    materiCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateSelectAllBtn();
+            const checkedAny = document.querySelector('.materi-checkbox:checked');
+            if (checkedAny) {
+                materiErrorMsg.classList.add('d-none');
+            }
+        });
+    });
+
+    // Form validation untuk materi selection
+    form.addEventListener('submit', function(e) {
+        const checkedMateri = document.querySelectorAll('.materi-checkbox:checked').length;
+        if (checkedMateri === 0) {
+            e.preventDefault();
+            materiErrorMsg.classList.remove('d-none');
+            document.querySelector('.materi-checkboxes-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
+        
         submitBtn.querySelector('.btn-text').classList.add('d-none');
         submitBtn.querySelector('.btn-loading').classList.remove('d-none');
         submitBtn.disabled = true;
     });
+
+    updateSelectAllBtn();
 
     @if($errors->any())
         document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'center' });

@@ -3,8 +3,8 @@
 @section('content')
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-10">
-            <div class="card overflow-hidden">
+        <div class="col-12 col-xl-10">
+            <div class="card player-setup-card overflow-hidden">
                 <!-- Header -->
                 <div class="card-header crimson-header">
                     <div class="d-flex align-items-center">
@@ -20,7 +20,7 @@
                     </div>
                 </div>
 
-                <div class="card-body p-4 p-lg-5" style="background: var(--crimson-subtle);">
+                <div class="card-body player-setup-body p-4 p-lg-5">
                     <!-- Progress Steps -->
                     <div class="setup-progress mb-4">
                         <div class="d-flex justify-content-between align-items-center">
@@ -49,7 +49,13 @@
                                 <h6 class="fw-bold text-crimson mb-1">Detail Permainan</h6>
                                 <p class="mb-0 small" style="color:var(--gray-700);">
                                     <i class="fas fa-book-open me-1 text-crimson"></i>Materi:
-                                    <span class="fw-semibold">{{ $game->materi->nama }}</span><br>
+                                    <span class="fw-semibold">
+                                        @php
+                                            $materiIds = is_array($game->materi_id) ? $game->materi_id : [$game->materi_id];
+                                            $materis = \App\Models\Materi::whereIn('id', $materiIds)->pluck('nama')->toArray();
+                                        @endphp
+                                        {{ implode(', ', $materis) }}
+                                    </span><br>
                                     <i class="fas fa-users me-1 text-crimson"></i>Jumlah Pemain:
                                     <span class="fw-semibold">{{ $game->jumlah_pemain }}</span>
                                 </p>
@@ -64,55 +70,56 @@
                                 'style_1' => 'Style 1', 'style_2' => 'Style 2',
                                 'style_3' => 'Style 3', 'style_4' => 'Style 4',
                                 'style_5' => 'Style 5', 'style_6' => 'Style 6',
-                                'style_7' => 'Style 7', 'style_8' => 'Style 8',
                             ];
                         @endphp
 
                         <div class="players-container mb-4">
                             @for($i = 1; $i <= $game->jumlah_pemain; $i++)
-                                <div class="player-input-card mb-3" id="player-card-{{ $i }}">
-                                    <div class="d-flex align-items-center">
+                                <div class="player-input-card" id="player-card-{{ $i }}">
+                                    <div class="player-card-layout">
                                         <!-- Number circle — maroon for odd, white for even -->
-                                        <div class="player-number me-3">
+                                        <div class="player-number">
                                             <div class="number-circle {{ $i % 2 === 1 ? 'token-maroon' : 'token-white' }}">
                                                 {{ $i }}
                                             </div>
                                         </div>
-                                        <div class="flex-grow-1">
-                                            <label for="nama{{ $i }}" class="form-label fw-semibold mb-1" style="color:var(--gray-700);">
-                                                Nama Pemain {{ $i }}
-                                            </label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white border-end-0" style="border-radius:10px 0 0 10px; border-color:var(--gray-200);">
-                                                    <i class="fas fa-user text-crimson"></i>
-                                                </span>
-                                                <input type="text"
-                                                       class="form-control @error('nama.' . ($i-1)) is-invalid @enderror"
-                                                       id="nama{{ $i }}" name="nama[]"
-                                                       placeholder="Contoh: Andi"
-                                                       value="{{ old('nama.' . ($i-1)) }}"
-                                                       required autocomplete="off"
-                                                       style="border-radius:0 10px 10px 0; border-left:none;">
-                                            </div>
-                                            @error('nama.' . ($i-1))
-                                                <div class="invalid-feedback d-block">
-                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
+                                        <div class="player-form-fields">
+                                            <div class="player-name-field">
+                                                <label for="nama{{ $i }}" class="form-label fw-semibold mb-1">
+                                                    Nama Pemain {{ $i }}
+                                                </label>
+                                                <div class="input-group player-name-input">
+                                                    <span class="input-group-text">
+                                                        <i class="fas fa-user text-crimson"></i>
+                                                    </span>
+                                                    <input type="text"
+                                                           class="form-control @error('nama.' . ($i-1)) is-invalid @enderror"
+                                                           id="nama{{ $i }}" name="nama[]"
+                                                           placeholder="Contoh: Andi"
+                                                           value="{{ old('nama.' . ($i-1)) }}"
+                                                           required autocomplete="off">
                                                 </div>
-                                            @enderror
+                                                @error('nama.' . ($i-1))
+                                                    <div class="invalid-feedback d-block">
+                                                        <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
+                                                    </div>
+                                                @enderror
+                                            </div>
 
-                                            <div class="mt-2">
-                                                <label class="form-label fw-semibold mb-1" style="color:var(--gray-700);">
+                                            <div class="player-token-field">
+                                                <label class="form-label fw-semibold mb-1">
                                                     Pilih Bidak
                                                 </label>
                                                 @php
                                                     $selectedToken = old('token_style.' . ($i-1), array_keys($tokenOptions)[$i - 1] ?? 'style_1');
+                                                    $selectedToken = array_key_exists($selectedToken, $tokenOptions) ? $selectedToken : 'style_1';
                                                 @endphp
-                                                <div class="token-current-preview mb-2" id="token-preview-wrapper-{{ $i }}">
+                                                <div class="token-current-preview" id="token-preview-wrapper-{{ $i }}">
                                                     <img id="token-preview-{{ $i }}"
                                                          src="{{ asset('images/tokens/' . $selectedToken . '.png') }}"
                                                          alt="Preview Bidak Pemain {{ $i }}"
                                                          class="token-preview-image-lg">
-                                                    <span class="small ms-2" style="color:var(--gray-500);" id="token-preview-label-{{ $i }}">{{ $tokenOptions[$selectedToken] ?? 'Style 1' }}</span>
+                                                    <span class="small ms-2" id="token-preview-label-{{ $i }}">{{ $tokenOptions[$selectedToken] ?? 'Style 1' }}</span>
                                                 </div>
                                                 <div class="token-options-grid @error('token_style.' . ($i-1)) is-invalid @enderror">
                                                     @foreach($tokenOptions as $value => $label)
@@ -187,9 +194,27 @@
 </div>
 
 <style>
+    .player-setup-card {
+        border: 1px solid rgba(185,28,28,0.12);
+        border-radius: 24px;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .player-setup-body {
+        background:
+            linear-gradient(180deg, rgba(255,255,255,0.9), rgba(253,246,246,0.95)),
+            var(--crimson-subtle);
+    }
+
+    .players-container {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
     /* Player number circle variants */
     .number-circle {
-        width: 45px; height: 45px; border-radius: 50%;
+        width: 44px; height: 44px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
         font-weight: 700; font-size: 1.1rem;
     }
@@ -205,34 +230,70 @@
     }
 
     .player-input-card {
-        background: white; padding: 16px; border-radius: 14px;
+        background: white; padding: 18px; border-radius: 16px;
         box-shadow: var(--shadow-sm);
-        border: 1.5px solid rgba(185,28,28,0.08);
-        transition: all 0.3s ease;
+        border: 1px solid rgba(185,28,28,0.12);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     }
     .player-input-card:hover {
-        transform: translateX(4px);
+        transform: translateY(-2px);
         box-shadow: var(--shadow-md);
-        border-color: var(--crimson);
+        border-color: rgba(185,28,28,0.28);
+    }
+
+    .player-card-layout {
+        display: grid;
+        grid-template-columns: 44px minmax(0, 1fr);
+        gap: 14px;
+        align-items: start;
+    }
+
+    .player-form-fields {
+        display: grid;
+        gap: 14px;
+    }
+
+    .player-name-field .form-label,
+    .player-token-field .form-label {
+        color: var(--gray-700);
+    }
+
+    .player-name-input .input-group-text {
+        background: #FFFFFF;
+        border-color: var(--gray-200);
+        border-radius: 10px 0 0 10px;
+    }
+
+    .player-name-input .form-control {
+        min-height: 44px;
+        border-left: none;
+        border-radius: 0 10px 10px 0;
     }
 
     .token-current-preview {
         display: flex; align-items: center; padding: 8px 10px;
         border: 1.5px solid var(--crimson-soft); border-radius: 10px;
         background: var(--crimson-subtle);
+        margin-bottom: 10px;
     }
+
+    .token-current-preview span {
+        color: var(--gray-600);
+        font-weight: 600;
+    }
+
     .token-preview-image-lg {
-        width: 34px; height: 34px; object-fit: contain;
+        width: 38px; height: 38px; object-fit: contain;
         border-radius: 8px; border: 1px solid var(--gray-200);
         background: white; padding: 2px;
     }
 
     .token-options-grid {
-        display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px;
+        display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px;
     }
     .token-option-item {
         border: 1.5px solid var(--crimson-soft); border-radius: 10px;
-        padding: 6px 4px; text-align: center; cursor: pointer;
+        padding: 7px 4px; text-align: center; cursor: pointer;
         background: white; transition: all 0.2s ease; margin: 0;
     }
     .token-option-item:hover {
@@ -240,9 +301,20 @@
         box-shadow: 0 4px 12px rgba(185,28,28,0.18);
     }
     .token-option-item input { display: none; }
-    .token-option-item img { width: 38px; height: 38px; object-fit: contain; border-radius: 6px; }
+    .token-option-item img { width: 36px; height: 36px; object-fit: contain; border-radius: 6px; }
     .token-option-item:has(input:checked) {
         border-color: var(--crimson); background: var(--crimson-soft);
+        box-shadow: inset 0 0 0 1px rgba(185,28,28,0.12);
+    }
+
+    @media (max-width: 992px) {
+        .players-container { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 576px) {
+        .player-card-layout { grid-template-columns: 1fr; }
+        .player-number { display: flex; }
+        .token-options-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
 </style>
 
@@ -263,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const input = card.querySelector('input[type="text"]');
         if (!input) return;
         input.addEventListener('focus', () => {
-            card.style.transform = 'translateX(4px)';
+            card.style.transform = 'translateY(-2px)';
             card.style.borderColor = 'var(--crimson)';
             card.style.boxShadow = '0 6px 20px rgba(185,28,28,0.18)';
         });

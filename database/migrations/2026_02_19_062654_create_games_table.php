@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('games', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('materi_id')->constrained();
+            // Changed from foreignId with constraint to json to support multiple materis
+            $table->json('materi_id')->comment('Array of selected materi IDs');
             $table->integer('jumlah_pemain');
             $table->enum('status', ['waiting', 'playing', 'finished'])->default('waiting');
             $table->unsignedBigInteger('current_question_id')->nullable();

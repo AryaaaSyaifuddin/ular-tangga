@@ -21,12 +21,18 @@ class GameController extends Controller
     public function setupStore(Request $request)
     {
         $request->validate([
-            'materi_id' => 'required|exists:materis,id',
+            'materi_id' => 'required|array|min:1',
+            'materi_id.*' => 'exists:materis,id',
             'jumlah_pemain' => 'required|integer|min:1|max:4'
+        ], [
+            'materi_id.required' => 'Pilih minimal satu materi pembelajaran',
+            'materi_id.array' => 'Format materi tidak valid',
+            'materi_id.min' => 'Pilih minimal satu materi pembelajaran',
+            'materi_id.*.exists' => 'Salah satu materi tidak ditemukan',
         ]);
 
         $game = Game::create([
-            'materi_id' => $request->materi_id,
+            'materi_id' => $request->materi_id, // Array of materi_id
             'jumlah_pemain' => $request->jumlah_pemain,
             'status' => 'waiting'
         ]);
@@ -51,8 +57,6 @@ class GameController extends Controller
             'style_4',
             'style_5',
             'style_6',
-            'style_7',
-            'style_8',
         ];
 
         $request->validate([
@@ -89,11 +93,14 @@ class GameController extends Controller
 
     public function nextQuestion(Game $game)
     {
-        // Ambil soal acak dari materi game
-        $soal = Soal::where('materi_id', $game->materi_id)->inRandomOrder()->first();
+        // Ambil soal acak dari salah satu materi yang dipilih
+        // $game->materi_id sekarang adalah array of IDs
+        $materiIds = is_array($game->materi_id) ? $game->materi_id : [$game->materi_id];
+        
+        $soal = Soal::whereIn('materi_id', $materiIds)->inRandomOrder()->first();
 
         if (!$soal) {
-            return response()->json(['error' => 'Tidak ada soal untuk materi ini'], 404);
+            return response()->json(['error' => 'Tidak ada soal untuk materi yang dipilih'], 404);
         }
 
         // Simpan soal ke session (gunakan prefix game id)

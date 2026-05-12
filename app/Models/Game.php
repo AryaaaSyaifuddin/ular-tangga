@@ -13,6 +13,7 @@ class Game extends Model
 
     protected $casts = [
         'status' => 'string',
+        'materi_id' => 'array', // Cast materi_id sebagai array untuk support multiple materis
     ];
 
     public function materi()
